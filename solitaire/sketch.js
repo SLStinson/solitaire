@@ -3,17 +3,22 @@ var emptySlots = [];
 var card;
 var previousMouseX = null;
 var previousMouseY = null;
-var selectedCard = null;;
+var selectedCard = null;
+var selectedCardChildren = [];
 
 function setup() {
   createCanvas(1000,800);
   cards.push(new Card(200,200,2,5,0));
   cards.push(new Card(450,200,1,4,1));
   cards.push(new Card(450,400,3,13,2));
+  cards.push(new Card(450,700,3,1,3));
+  cards.push(new Card(570,400,3,2,4));
   for(var i = 1; i < 8; i++){
-    emptySlots.push(new EmptySlot((i*100)+10,200,-i));
+    emptySlots.push(new EmptySlot((i*100)+10,200,-i, ((c, _) => c.valueRaw === 13)));
   }
-  // card = new Card(200,200,2,5);
+  for(var i = 1; i < 5; i++){
+    emptySlots.push(new EmptySlot((i*100)+10,50,-i, ((c, vs) => (vs === null && c.rawValue === 1) || c.valueRaw === vs[vs.length-1].valueRaw+1)));
+  }
 }
 
 function draw() {
@@ -26,6 +31,7 @@ function draw() {
   
   if(selectedCard != null){
     selectedCard.display();
+    selectedCardChildren.forEach(c => c.display());
   }
 }
 
@@ -66,6 +72,13 @@ function mousePressed(){
         selectedCard.previousX = selectedCard.x;
         selectedCard.previousY = selectedCard.y;
         cardSelected = true;
+        
+        var currentChild = selectedCard.child;
+        while(currentChild != null) {
+          var childCard = cards.find(c => c.id === currentChild);
+          selectedCardChildren.push(childCard);
+          currentChild = childCard.child;
+        }
     }
   });
 
@@ -79,7 +92,7 @@ function mouseReleased(){
     var cardMoved = false;
 
     cards.forEach(c => {
-      if(c !== selectedCard && (mouseX > c.x && mouseY > c.y && mouseX < c.x + 80 && mouseY < c.y + 120)){
+      if(c !== selectedCard && !c.disabled && (mouseX > c.x && mouseY > c.y && mouseX < c.x + 80 && mouseY < c.y + 120)){
         var success = c.setChild(selectedCard);
         if(success){
           cardMoved = true;
@@ -97,20 +110,17 @@ function mouseReleased(){
     });
 
     if(!cardMoved && selectedCard.parent != null){
-      console.log("path2");
       selectedCard.removeParent();
       cardMoved = true;
     }
 
     console.log(cardMoved);
     if(!cardMoved){
-      console.log("path3");
-
-      selectedCard.x = selectedCard.previousX;
-      selectedCard.y = selectedCard.previousY;
+      selectedCard.setPosition(selectedCard.previousX, selectedCard.previousY);
     }
 
     selectedCard = null;
+    selectedCardChildren = [];
   }
 
   previousMouseX = null;

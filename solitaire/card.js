@@ -9,6 +9,7 @@ class Card{
       this.value = this.getValue(value);
       this.parent = null;
       this.child = null;
+      this.disabled = false;
     }
   
     display(){
@@ -50,7 +51,7 @@ class Card{
     }
   
     setChild(card){
-      if(card.valueRaw == this.valueRaw-1 && this.isOppositeSuit(card.suitRaw)){
+      if(!this.disabled && card.valueRaw == this.valueRaw-1 && this.isOppositeSuit(card.suitRaw)){
         this.child = card.id;
         card.setPosition(this.x, this.y+20);
         card.setParent(this.id);
@@ -78,6 +79,9 @@ class Card{
     setPosition(x,y){
       this.x = x;
       this.y = y;
+      if(this.child != null){
+        cards.find(c => c.id === this.child).setPosition(this.x, this.y+20);
+      }
     }
   
     isOppositeSuit(suit){
