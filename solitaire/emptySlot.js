@@ -5,15 +5,12 @@ class EmptySlot {
     this.id = id;
     this.child = null;
     this.childRule = childRule;
-    this.suitStack = [];
-    this.isSuitStack = isSuitStack;
   }
 
   display() {
     noFill();
     stroke(2);
     rect(this.x, this.y, 85, 125);
-    this.suitStack.forEach(c => c.display())
   }
 
   mouseIsOver(mouseX, mouseY) {
@@ -37,5 +34,21 @@ class EmptySlot {
 
   addToSuitStack(card) {
     this.suitStack.push(card);
+  }
+}
+
+class SuitStack{
+  constructor(x,y,id){
+    this.x = x;
+    this.y = y;
+    this.id = id;
+    this.stack = [];
+  }
+
+  display() {
+    noFill();
+    stroke(2);
+    rect(this.x, this.y, 85, 125);
+    this.stack.forEach(c => c.display())
   }
 }
